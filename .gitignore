@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+# ROS2 (driverless_dv)
+driverless_dv/build/
+driverless_dv/install/
+driverless_dv/log/
+**/__pycache__/
+*.pyc
