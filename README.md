@@ -1,4 +1,4 @@
-# Onboarding DV — E-Racing Ultra Blaster
+# Onboarding Específico DV — E-Racing
 
 Sistema completo do desafio de onboarding da divisão Driverless: um carrinho que identifica dois cones (um laranja, um azul), calcula o ponto médio entre eles, dirige até lá e "estaciona" — com telemetria ao vivo num dashboard web e um kill switch de emergência.
 
