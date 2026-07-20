@@ -274,3 +274,51 @@ Ver `Telemetria/DECISOES.md` — documenta, entre outras coisas, por que `contro
 ## 10. Troubleshooting
 
 Caso tenha problemas com a porta serial, verifique ls /dev/tty* antes e depois de plugar o arduíno. Verifique qual arquivo é adicionado. Esta porta é a serial correta do arduíno. Normalmente aparece como /dev/ttyACM0 ou /dev/ttyACM1.
+
+---
+## 11. Telemetria
+
+A Telemetria tem função de monitorar de forma remota o estado do carro durante a execução do desafio, obtendo dados como velocidade, aceleração e estado do motor. Além disso, tem como objetivo a transmissão de dados e o **Kill Switch**, mecanismo que manda um sinal  pro arduino que força uma parada de emergência. 
+
+### 11.1 Fluxo de dados
+
+```
+Telemetria/
+  control_node.py        -> envia dados do veículo via UDP (:5006)
+      │
+      ▼
+  backend/app.py         -> recebe telemetria da Jetson e retransmite via Socket.IO
+      │
+      ▼
+  Dashboard Web          -> exibe velocidade, direção e estado do sistema
+
+Kill Switch:
+  Dashboard Web          -> botão de parada de emergência
+      │
+      ▼
+  backend/app.py         -> recebe evento Socket.IO e envia UDP (:6000)
+      │
+      ▼
+  control_node.py        -> interrompe imediatamente o movimento do veículo
+```
+O nó de controle envia as informações sobre o estado do veículo para o backFlask utilizando UDP. O back recebe os dados e retransmite em tempo real para o dashboard web, utilizando Socket.IO
+
+```
+Kill Switch
+Fluxo de Kill Switch:
+
+  Dashboard Web          -> operador aciona o botão de emergência
+      │ Socket.IO
+      ▼
+  backend/app.py         -> recebe o evento "kill" e encaminha o comando para a Jetson
+      │ UDP :6000
+      ▼
+  control_node.py        -> ativa a parada de emergência e interrompe imediatamente o veículo
+```
+Ao pressionar o botão de kill no dashboard, o backend envia um comando UDP para a Jetson, que interrompe o movimento e desliga o motor
+
+### 11.2 Teste sem Hardware
+
+Para facilidar o desenvolvimento e validar partes da telemetria, foi criado o arquivo `fake_sender.py` que simula o envio de dados para o backend sem necessidade do ROS2, arduino, ZED e da Jetson. Tem como função validar a transmissão de dados, o acionamento do Kill Switch e a recepção de dados no dashboard
+
+---
