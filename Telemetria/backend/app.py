@@ -20,7 +20,7 @@ socketio = SocketIO(
     async_mode="threading"
 )
 
-NOTEBOOK_IP = "127.0.0.1"
+JETSON_IP = "143.106.207.93"
 
 TELEMETRY_PORT = 5006
 KILL_PORT = 6000
@@ -50,7 +50,7 @@ def on_kill():
 
     sock.sendto(
         b"KILL",
-        (NOTEBOOK_IP, KILL_PORT)
+        (JETSON_IP, KILL_PORT)
     )
 
     sock.close()
