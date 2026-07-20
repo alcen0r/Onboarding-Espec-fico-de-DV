@@ -1,11 +1,16 @@
+# Bibliotecas necessárias para o funcionamento do ROS2
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
-import matplotlib.pyplot as plt
 
+# Biblioteca necessária para plotar os pontos recebidos e o waypoint resultante
+import matplotlib.pyplot as plt
 
 class MappingNode(Node):
     def __init__(self):
+        "Método construtor do nó de Mapeamento"
+
+        # Herda da classe Node padrão do ros2, atribuindo um id 'control_node' para identificação no comando ros2 run
         super().__init__("mapping_node")
 
         # Subscriber que recebe o tópico "coordinates"
@@ -21,8 +26,15 @@ class MappingNode(Node):
         self.get_logger().info("Mapping node iniciado")
 
     def coordinates_callback(self, msg):
+        "Chamada quando uma coordenada é recebida, calculando um novo waypoint e o publicando em seu próprio tópico"
+
         # Nosso array/vetor chega no formato [x1, y1, x2, y2]
         data = msg.data
+
+        # Proteção contra uma mensagem em formato incorreto de quebrar o unpack abaixo
+        if len(data) != 4:
+            self.get_logger().warn( f"Esperava 4 valores [x1,y1,x2,y2], recebi {len(data)}. Ignorando.")
+            return
 
         # ========== PEGAR COORDENADAS ==========
 
@@ -90,6 +102,7 @@ class MappingNode(Node):
 
 
 def main(args=None):
+    "Controla as ações de inicialização do nó"
     rclpy.init(args=args)
     node = MappingNode()
 
@@ -101,7 +114,8 @@ def main(args=None):
 
     finally:
         node.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 
 if __name__ == "__main__":
